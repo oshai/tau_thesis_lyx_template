@@ -282,4 +282,63 @@ which allows the 32 GB to be matched with machine B.
 \end{figure}
 
 
+\section{Observations from the Workloads}
+%-------------------------------------------
+
+Machines currently available on the market typically have multi-core
+CPUs and large amounts of memory.
+Therefore, we may expect to see situations similar to the ones
+described above.
+In addition, jobs comes with core and memory requirement, and in most
+cases jobs are allocated one per core.
+This may waste cycles due to wait states and I/O, but makes things
+much more predictable.
+
+\begin{figure}\centering
+	\includegraphics{figures/cores_burst.eps}
+\caption{Bursts in jobs cores requirements: pool A is the burstiest.
+  Pool B's bursts are sparse, while pool C's have only a small
+  amplitude.
+  In pool D there are virtually no bursts of jobs requiring more than
+  one core.}
+\label{fig:cores_burst_multiplot}
+\end{figure}
+
+To characterize the use of cores and memory in each of the pools, 
+we used the traces mentioned above, 
+and partitioned them into buckets of 1000 jobs each. 
+This resulted in 13K buckets for pools A, B, and C, 
+and 10K buckets for pool D.
+Such small buckets allow us to observe bursts of activity that deviate
+from the average.
+
+\begin{figure}\centering
+	\includegraphics{figures/memory_burst.eps}
+\caption{Bursts in jobs memory requirements: pools A and B are the
+  most bursty; A in particular has bursts that exceed 20 GB on average.
+  Pool C is somewhat steadier, while pool D exhibits periods of
+  particularly low memory demands between the bursts.}
+\label{fig:memory_burst_multiplot}
+\end{figure}
+
+Figures \ref{fig:cores_burst_multiplot} and
+\ref{fig:memory_burst_multiplot} show the jobs' average cores and
+memory requirements in each of the buckets, for each of the four pools,
+respectively.
+As can be seen, different pools exhibit different magnitudes of bursts
+of jobs with high core or memory demands.
+Pool A is the most bursty in both dimensions; it is the only pool that
+had a bucket in which the average job core requirement is higher than
+2, and multiple buckets in which the average memory requirement is
+larger than 20 GB.
+
+Pool B exhibits sparse bursts of jobs with high core demands, but
+intense bursts of high memory requirements.
+Pool C exhibits continuous moderate core demands, and also relatively
+steady memory bursts.
+Finally, pool D has virtually no bursts of jobs requiring more than
+one core, but it does exhibit bursts of high memory demands, along
+with periods of particularly low memory requirements.
+
+
 
