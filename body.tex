@@ -569,3 +569,56 @@ next.
 %\end{figure}
 
 
+\chapter{The \maj\ Meta-Heuristic}
+%=================================
+\label{sec:max-jobs}
+
+The experiment described above indicates that counterintuitively, 
+\mif\ does not yield the best performance in all pools.
+As an alternative, we therefore suggest the use of the \maj\ meta-heuristic.
+
+%[Dror - lets leave that (how real systems work) to when we describe the load results, which are also different from the buckets].
+%While the experiments done above indicate that \mif\ should provide
+%good performance, they are conducted in a highly artificial setting:
+%a large number of jobs is scheduled at once on a previously empty
+%pool.
+%But real systems work in an on-line setting, suffering from
+%fragmentation and lack of information regarding future events.
+%As results described below show, in such realistic situations
+%\mif\ does not always provide the best performance.
+%We therefore suggest the use of the \maj\ meta-heuristic.
+
+A meta-heuristic is an algorithm that employs other heuristics as
+subroutines.
+In our case, \maj\ uses all of the heuristics described before: \bfc,
+\bfm, \wfc, \wfm, and \mif.
+At each scheduling cycle, \maj\ picks the best schedule produced by
+any of these heuristics for this cycle.
+In other words, the meta-algorithm runs all the available heuristics
+as black-boxes and selects the one with the best result for the
+currently queued jobs.
+The target function defining ``best'' is maximizing the
+number of jobs assigned to machines in this cycle.
+Importantly, additional heuristics can be added later and the system
+will take advantage of them in those cases that they perform the best.
+
+Pseudo-code for the \maj\ meta-heuristic is given in Figure
+\ref{fig:max-jobs}.
+
+\begin{figure}\centering
+\fbox{\parbox{7cm}{
+    \begin{tabbing}
+    xx\=xxxxx\=xxxxx\=\+\kill
+    L -- list of heuristics\\
+    S -- list of proposed schedules (mapping jobs to hosts)\\[3mm]
+
+    foreach heuristic H in L\\
+    \> S[H] = H.Schedule(waitingQueue)\\
+    maxJobsSchedule = MaxJobsSchedule(S)\\
+    Dispatch(maxJobsSchedule)
+    \end{tabbing}
+}~~}
+  \caption{The \maj\ meta-heuristic.}
+  \label{fig:max-jobs}
+\end{figure}
+
