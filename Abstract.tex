@@ -3,20 +3,5 @@
 
 \chapter*{Abstract}
 
-In this paper we investigate the issue of resource matching between
-jobs and machines in Intel's compute farm.
-We show that common heuristics such as \bef\ and \wof\ may fail to
-properly utilize the available resources when applied to either cores
-or memory in isolation.
-In an attempt to overcome the problem we propose \mif, a heuristic
-which attempts to balance usage between resources.
-While this indeed usually improves upon the single-resource heuristics,
-it too fails to be optimal in all cases.
-As a solution we default to \maj, a meta-heuristic that employs all
-the other heuristics as sub-routines, and selects the one which
-matches the highest number of jobs.
-Extensive simulations that are based on real workload traces from
-four different Intel sites demonstrate that \maj\ is indeed the most
-robust heuristic for diverse workloads and system configurations, and
-provides up to 22\% reduction in the average wait time of jobs.
+In this paper we investigate the issue of resource matching between jobs and machines in Intel's compute farm. We show that common heuristics such as Best-Fit and Worse-Fit may fail to properly utilize the available resources when applied to either cores or memory in isolation. In an attempt to overcome the problem we propose Mix-Fit, a heuristic which attempts to balance usage between resources. While this indeed usually improves upon the single-resource heuristics, it too fails to be optimal in all cases. As a solution we default to Max-Jobs, a meta-heuristic that employs all the other heuristics as sub-routines, and selects the one which matches the highest number of jobs. Extensive simulations that are based on real workload traces from four different Intel sites demonstrate that Max-Jobs is indeed the most robust heuristic for diverse workloads and system configurations, and provides up to 22% reduction in the average wait time of jobs.  
 
