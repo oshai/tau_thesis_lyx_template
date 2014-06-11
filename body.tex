@@ -820,3 +820,166 @@ individual heuristic, as seen for example in pool A.
 This is probably due to situations in which packing jobs very densely
 leads to reduced performance in a successive scheduling round.
 
+
+\chapter{Related Work}
+%=====================
+\label{sec:related}
+
+There are very few externally available publications that relate to \nb.
+Zhang et al.\ investigated the use of dynamic rescheduling of
+\nb\ jobs between pools which improves utilization at the farm level
+\cite{Zhang2010}.
+Our work in effect complements theirs by focusing on utilization
+improvements within the individual pools.
+
+The question of assigning machines to jobs has received some attention
+in the literature.
+Xiao et al.\ studied a problem similar to ours and also concluded that
+one-dimensional strategies yields sub-optimal performance
+\cite{Xiao02dynamiccluster}.
+In their work, however, cores are considered shared resources, and
+thus the investigation focused on the interference between the jobs.
+Amir et al.\ proposed a load balancing scheme where the targets for
+process migration are selected so as to avoid saturation of any single
+resource \cite{amir00}.
+This is similar to avoiding high $\alpha$ values in our terminology.
+
+The idea of symbiotic scheduling is also related to our work.
+Symbiotic scheduling attempts to find sets of jobs that complement
+each other and together use the system resources effectively.
+This was initiated in the context of hyperthreading (or simultaneous
+multithreading) processors \cite{snavely00,eyerman10},
+and extended also to the domain of clusters \cite{weinberg06}.
+
+Meta-schedulers like the \maj\ approach have also been used before.
+For example, Talby used such a meta-scheduler to select among different
+versions of backfilling in scheduling large-scale parallel machines
+\cite{talby05}.
+However, this was done by simulating recent work in the background and
+then switching to the version that looks best.
+Such an approach depends on an assumption of locality, meaning that
+the future workload will also benefit from this version.
+In our work we actually run all the contending variants on the jobs in
+the queue, and select the one that indeed achieves more assignments.
+
+Another meta-scheduler example is the portfolio scheduler
+\cite{Deng1305Protfolio} that was developed in parallel to our work. The
+portfolio scheduler is a general-purpose mechanism that applies
+to scientific computing with various target functions for scheduling. \maj\ on
+the contrary, applies to batch systems and its target function is specified as
+maximizing the total number of running jobs.
+
+It should be noted that due to the assumption that cores and memory
+are allocated exclusively to jobs, our problem is not directly related
+to the well-known 2D bin-packing problem.
+In particular, it is not allowed to pack multiple jobs with limited
+memory requirements onto the same core \cite{mishra11}. 
+It does, however, correspond the problem of allocating virtual machines
+to physical servers which has gained much attention in resent years.
+This has been called the \emph{vector bin-packing problem}, since the
+allocation can be depicted as the vector-sum of vectors representing
+the resource requirements of individual virtual machines \cite{panigrahy11}.
+This directly corresponds to our depiction of rectangles that connect
+at their corners in Figures \ref{fig:wf_better}, \ref{fig:bf_better}, etc.
+
+The ideas suggested for vector bin-packing are all very similar to our
+\mif\ algorithm.
+For example, they are also based on normalizing the resources and
+creating a square (or multi-dimensional cube, if there are more
+resources than 2).
+The available resources are then represented by a diagonal vector, the
+consumption by other vectors, and the basic idea is to try to make
+these vectors close to each other.
+However, the details may differ.
+
+Mishra and Sahoo \cite{mishra11} describe the SandPiper algorithms
+used in Xen, and the VectorDot algorithm \cite{singh08}.
+They show that both suffer from failures similar to the ones we
+demonstrated in Section \ref{sec:matching}.
+For example, the VectorDot algorithm uses the dot product of the
+consumed resources vector and the request vector to identify requests
+that are orthogonal to the current usage, and thus may be expected to
+complement it.
+However, this is subject to artifacts because the lengths of the
+vectors also affect the result.
+They then suggest a rather complex approach for identifying
+complementary vectors based on a discretization of the space called
+the ``planar resource hexagon''.
+They did not, however, evaluate its performance compared to existing
+heuristics.
+
+Panigrahy et al.\ study a wide range of \fif-Decreasing-based
+algorithms \cite{panigrahy11}.
+The idea is to combine the requirements for different resources in
+some way into a single number, and then pack in a decreasing order.
+However, this approach loses the important geometrical structure of
+the problem.
+They therefore also consider heuristics based on the dot product or
+the maximal required resource.
+The evaluations are based on presumed synthetic distributions.
+
+Compared with these previous works, our approach of using just the
+angle between two vectors is among the simplest.
+Basing the comparison at the top-right corner for improved
+discrimination seems to be novel.
+It would be interesting to evaluate the effect of these details, but
+our results so far indicate that they may not have much impact for
+real workloads.
+
+Lee et al.\ investigated the problem of virtual machines allocation
+taking into consideration the consolidation of virtual machines onto
+the same physical platform, and the possible resulting resource
+contention \cite{sangmin}.
+In principle such considerations are also applicable to our work.
+However, we note that the configuration of \nb\ pools is such that I/O
+and bandwidth are seldom a bottleneck.
+
+Finally, it is important to remember that since the PPM considers 
+the jobs one at a time
+there is a limit on the optimizations that can be applied. 
+Looking further into the queue and considering more than one job 
+may yield significant improvements \cite{Shmueli05backfillingwith}.
+
+
+\chapter{Conclusions}
+%====================
+\label{sec:conclusions}
+
+Matching jobs with resources is an NP-hard problem.
+The common practice is therefore to rely on heuristics to do the
+matching.
+In this paper we investigated the problem of resource matching in
+Intel's compute farm, and showed that none of the well-known
+heuristics such as \bef\ or \wof\ yield optimal performance in
+all workload scenarios and cases.
+This stems from two reasons.
+First, these heuristics focus on a single resource, either cores or
+memory, whereas in reality the contention may apply to the other
+resource.
+To address this problem we implemented a specialized heuristic, \mif,
+that takes both resources into account and tries to create an
+assignment that leads to a balanced use of the resources.
+In principle this can be extended to more than two resources.
+While this too failed to be optimal in all cases, it did show some
+improvement under certain conditions.
+
+Second, the nature of dynamically changing demands prevent a specific
+use-case-tailored algorithm to be optimal for all cases.
+For that, we proposed a meta-heuristic called \maj, that is not
+tailored to a specific workload or scenario.
+Rather, it uses the other heuristics as black-boxes, and chooses, in
+every scheduling cycle, the one that yields the maximal number of
+matched jobs.
+We have demonstrated through simulations that max-jobs is highly
+competitive with all the individual heuristics, and as such is robust
+against changes in workload or configuration.
+
+%In the future we plan to continue our investigation in several
+%directions.
+%One is a more detailed investigation of the impact of using
+%Heterogeneous machines, in which the ratio of cores to memory is not
+%fixed.
+%Another is to consider how to relieve the constraint that cores are
+%allocated exclusively to distinct jobs, without any time slicing.
+
+
