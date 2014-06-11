@@ -229,4 +229,57 @@ aforementioned traces, demonstrating the effectiveness of the different heuristi
 under different workloads.
 
 
+\section{Synthetic Examples of Heuristics Failures}
+%-----------------------------------------------------
+
+In our examples we consider two machines, A and B, each having four
+cores and 32 GB of memory.
+Assume that 8 jobs are queued at the PPM in the following priority order: two jobs
+of one core and 16 GB of memory, and then 6 jobs of one core and 4 GB of
+memory.
+As can be seen in Figure \ref{fig:wf_better_A}, \bef\ matches the first
+two jobs with machine A, totally exhausting its memory, and the next
+four jobs with machine B, thereby exhausting its cores.
+The end result is two unutilized cores on machine A, half the memory
+unutilized on machine B, and two jobs that remain pending at the PPM.
+\wof\ on the other hand matches the first two jobs on different
+machines, which leaves enough free space (cores and memory) for all the
+remaining 6 jobs to be matched.
+This is illustrated in Figure \ref{fig:wf_better_B}.
+
+\begin{figure}\centering
+\subfigure[\label{fig:wf_better_A}\bef]{
+	\includegraphics[width=0.45\textwidth]{figures/fig1a.eps}}
+~~~~
+\subfigure[\label{fig:wf_better_B}\wof]{
+	\includegraphics[width=0.45\textwidth]{figures/fig1b.eps}}
+\caption{Scenario for which \wof\ (right) is better than \bef\ (left).
+  Memory is depicted in 4 GB blocks.
+  Shading indicates mapping of a job to a certain core and certain
+  blocks of memory.
+  Note that both cores and memory are mapped exclusively to distinct
+  jobs.}
+\label{fig:wf_better}
+\end{figure}
+
+Another example is illustrated in Figure \ref{fig:bf_better}.
+The priority order here is 3 jobs of one core and 8 GB, followed by
+one job of one core and 32 GB of memory.
+As can be seen, \wof\ spreads the first three jobs on different
+machines, which doesn't leaves enough memory for the 32 GB job to be
+matched.
+\bef\ on the other hand matches the first three jobs on machines A, 
+which allows the 32 GB to be matched with machine B.
+
+\begin{figure}\centering
+\subfigure[\label{fig:bf_better_A}\bef]{
+	\includegraphics[width=0.45\textwidth]{figures/fig2b.eps}}
+~~~~
+\subfigure[\label{fig:bf_better_B}\wof]{
+	\includegraphics[width=0.45\textwidth]{figures/fig2a.eps}}
+\caption{Scenario for which \bef\ (left) is better than \wof\ (right). }
+\label{fig:bf_better}
+\end{figure}
+
+
 
