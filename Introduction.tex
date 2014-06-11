@@ -1,75 +1,110 @@
-%% LyX 2.0.5.1 created this file.  For more info, see http://www.lyx.org/.
-%% Do not edit unless you really know what you are doing.
+
 \chapter{Introduction}
+%=====================
 
-Introduction chapter. We recommend using bibtex to manage your list
-of references and organize the literature citation style. All is done
-automatically by \LyX{}. While working on separate files it's useful
-to include the bibtex file in each file locally, in the yellow note
-(so it's recognized by the compiler but not complaining if you run
-the Master document). 
+Intel owns an Internet-scale distributed compute farm that is used for
+running its massive chip-simulation workloads
+\citet[p.\ 78]{bentley01,evans03:book}.
+The farm is composed of tens of thousands of servers that are located
+in multiple data centers that are geographically spread around the
+globe.
+It is capable of running hundreds of thousands of simulation jobs and
+tests simultaneously, and handles a rate of thousands of newly
+incoming jobs every second.
 
+This huge compute capacity is managed by an in-house developed
+highly-scalable two-tier resource management and scheduling system
+called \nb.
+At the lower level \nb\ groups the servers into autonomous clusters
+that are referred to in \nb\ terminology as Physical Pools.
+Each such pool contains up to thousands of servers and is managed by a
+single \nb\ entity that is called the Physical Pool Manager or PPM.
+The role of the PPM is to accept jobs from the upper level, and to
+schedule them on underlying servers efficiently and with minimal
+waste.
 
-\section{Figures}
+At the upper level \nb\ deploys a second set of pools that are called
+Virtual Pools.
+Just like in the lower level, each virtual pool is managed by a single
+\nb\ component that is called the Virtual Pool Manager or VPM.
+The role of the VPMs is to cooperatively accept jobs from the users
+and distribute them to the different PPMs in order to spread the load
+across the farm.
+Together, these two layers, VPMs at the top and PPMs at the
+bottom, strive to utilize every compute resource across the farm.
+This paper focuses on the work done at the PPM level.
 
-Include figures as usual, first Insert -> Float -> Figure, then Insert
--> Graphics. 
+A basic requirement in \nb\ is the enforcement of fair-share
+scheduling among the various projects and business units within Intel
+that share the farm.
+Fair-share begins at the planning phase where different projects
+purchase different amounts of servers to be used for their jobs.
+These purchases eventually reflect their share of the combined
+resources.
+Once the shares are calculated, they are propagated to the PPMs where
+they are physically enforced. (The calculation and propagation
+mechanisms are beyond the scope of this paper.)
 
-Use cross-reference option to talk about Fig. \ref{fig:Some-caption-for}
+To enforce fair-share the PPM constantly monitors which jobs from
+which projects are currently running and the amount of resources they
+use.
+The PPM then selects from its wait queue the first job from the most
+eligible project (the project whose ratio of currently used resources
+to its share of the resources is the smallest) and tries to match a
+machine to that job.
+If the matching succeeds, the job is scheduled for execution on that
+machine.
+Otherwise, a reservation is made for the job, and the process is
+repeated while making sure not to violate previously made
+reservations.
+Such reservations enable jobs from projects that are lagging behind to
+obtain the required resources as soon as possible.
 
-\begin{figure}
-\begin{centering}
-\includegraphics[width=0.8\textwidth]{few_long_trajectories}
-\par\end{centering}
+Matching machines to jobs is done using any of a set of heuristics.
+For example, one may sort the list of candidate machines according to
+some pre-defined criteria --- e.g.\ increasing number of free cores or
+decreasing amount of free memory --- and then traverse the sorted list
+and select the first machine on which the job fits.
+This leads to variants of \bef\ and \wof\ schemes.
+Good sorting criteria reduce fragmentation thus allowing more jobs to be
+executed, and are critical for the overall utilization of the pool.
+Alternatively one may opt to reduce overhead and use a
+\fif\ heuristic.
 
-\caption{Some caption for the figure. Don't forget adding label to the figure
-and later using the cross-reference to it. \label{fig:Some-caption-for}}
+The sorting criteria are programmable configuration parameters in \nb.
+This allows one to implement various matching heuristics and apply
+them on different resources to best suit the workload characteristics
+and needs.
+\nb\ also allows individual jobs to specify different heuristics,
+while the pool administrator can set a default policy to be used for
+all jobs.
 
+In this paper we argue that no heuristic applied to a
+single resource in isolation can yield optimal performance under all
+scenarios and cases.
+To demonstrate our point we use both simple test cases and workload
+traces that were collected at four large Intel sites.
+Using the traces, we simulate the PPM behavior when applying the
+different heuristics to schedule the jobs.
+We show that depending on the workload different heuristics may be
+capable of scheduling a higher number of jobs.
 
-\end{figure}
+In an attempt to overcome the problem we develop ``\mif'' --- a
+combined heuristic that tries to balance the use of cores and memory.
+Intuitively this should reduce fragmentation at the pool.
+However, while generally better than the previous heuristics,
+\mif\ too fails to yield optimal assignments in some cases.
 
+As an alternative, we propose a meta-heuristic we call ``\maj''.
+\maj\ is not tailored towards specific workloads or configurations.
+Instead, it uses the aforementioned heuristics as sub-routines and
+chooses, in every scheduling cycle, the one that yields the highest
+number of matched jobs.
+This overcomes corner cases that hinder specific heuristics from being
+optimal in all cases, and conforms well to the \nb\ philosophy of
+maximizing resource utilization in every step.
+We demonstrate, through simulation, that \maj\ yields lower wait times
+by up to 22\% for all jobs in average under high loads.
+%Interestingly, we also find that \mif\ produces scheduling decisions
+%that are very close to those of \maj.
 
-
-\section{Tables}
-
-\begin{table}
-\begin{tabular}{|c|c|c|}
-\hline 
-row 1 & cell 1 & cell 2\tabularnewline
-\hline 
-\hline 
-row 2 & cell 1 & cell 2\tabularnewline
-\hline 
-\end{tabular}
-
-\caption{Table float first using Insert - > Float -> Table}
-
-
-\end{table}
-
-
-\begin{comment}
-Use: Insert Note -> Insert List/TOC -> Bibtex Bibliography
-\end{comment}
-
-
-
-
-\begin{comment}
-Then in the text you can use Insert citation (use the icon for the
-quick use)
-\end{comment}
-
-
-
-\section{Citations}
-
-The file references.bib in this folder is an example of how to organize
-the bibliography database. It is very simple to add a reference/citation
-to one of the items in the bibliography list, e.g. see the best source
-of information regarding the OpenPTV origins: \citet{Zhang2010}.
-Simply use: Insert -> Citation and choose from the list on the left.
-Add it to the list on the right and you'll be able to choose the format
-of author-year or author-number or just number to the references.
-At the same time, at the end of the document you'll find References
-chapter with all the cited references automatically chosen and included. 
