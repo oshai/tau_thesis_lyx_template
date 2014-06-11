@@ -227,6 +227,400 @@ aforementioned traces, demonstrating the effectiveness of the different heuristi
 under different workloads.
 
 
+\section{Synthetic Examples of Heuristics Failures}
+%-----------------------------------------------------
+
+In our examples we consider two machines, A and B, each having four
+cores and 32 GB of memory.
+Assume that 8 jobs are queued at the PPM in the following priority order: two jobs
+of one core and 16 GB of memory, and then 6 jobs of one core and 4 GB of
+memory.
+As can be seen in Figure \ref{fig:wf_better_A}, \bef\ matches the first
+two jobs with machine A, totally exhausting its memory, and the next
+four jobs with machine B, thereby exhausting its cores.
+The end result is two unutilized cores on machine A, half the memory
+unutilized on machine B, and two jobs that remain pending at the PPM.
+\wof\ on the other hand matches the first two jobs on different
+machines, which leaves enough free space (cores and memory) for all the
+remaining 6 jobs to be matched.
+This is illustrated in Figure \ref{fig:wf_better_B}.
+
+\begin{figure}\centering
+\subfigure[\label{fig:wf_better_A}\bef]{
+	\includegraphics[width=0.45\textwidth]{figures/fig1a.eps}}
+~~~~
+\subfigure[\label{fig:wf_better_B}\wof]{
+	\includegraphics[width=0.45\textwidth]{figures/fig1b.eps}}
+\caption{Scenario for which \wof\ (right) is better than \bef\ (left).
+  Memory is depicted in 4 GB blocks.
+  Shading indicates mapping of a job to a certain core and certain
+  blocks of memory.
+  Note that both cores and memory are mapped exclusively to distinct
+  jobs.}
+\label{fig:wf_better}
+\end{figure}
+
+Another example is illustrated in Figure \ref{fig:bf_better}.
+The priority order here is 3 jobs of one core and 8 GB, followed by
+one job of one core and 32 GB of memory.
+As can be seen, \wof\ spreads the first three jobs on different
+machines, which doesn't leaves enough memory for the 32 GB job to be
+matched.
+\bef\ on the other hand matches the first three jobs on machines A, 
+which allows the 32 GB to be matched with machine B.
+
+\begin{figure}\centering
+\subfigure[\label{fig:bf_better_A}\bef]{
+	\includegraphics[width=0.45\textwidth]{figures/fig2b.eps}}
+~~~~
+\subfigure[\label{fig:bf_better_B}\wof]{
+	\includegraphics[width=0.45\textwidth]{figures/fig2a.eps}}
+\caption{Scenario for which \bef\ (left) is better than \wof\ (right). }
+\label{fig:bf_better}
+\end{figure}
+
+
+\section{Observations from the Workloads}
+%-------------------------------------------
+
+Machines currently available on the market typically have multi-core
+CPUs and large amounts of memory.
+Therefore, we may expect to see situations similar to the ones
+described above.
+In addition, jobs comes with core and memory requirement, and in most
+cases jobs are allocated one per core.
+This may waste cycles due to wait states and I/O, but makes things
+much more predictable.
+
+\begin{figure}\centering
+	\includegraphics{figures/cores_burst.eps}
+\caption{Bursts in jobs cores requirements: pool A is the burstiest.
+  Pool B's bursts are sparse, while pool C's have only a small
+  amplitude.
+  In pool D there are virtually no bursts of jobs requiring more than
+  one core.}
+\label{fig:cores_burst_multiplot}
+\end{figure}
+
+To characterize the use of cores and memory in each of the pools, 
+we used the traces mentioned above, 
+and partitioned them into buckets of 1000 jobs each. 
+This resulted in 13K buckets for pools A, B, and C, 
+and 10K buckets for pool D.
+Such small buckets allow us to observe bursts of activity that deviate
+from the average.
+
+\begin{figure}\centering
+	\includegraphics{figures/memory_burst.eps}
+\caption{Bursts in jobs memory requirements: pools A and B are the
+  most bursty; A in particular has bursts that exceed 20 GB on average.
+  Pool C is somewhat steadier, while pool D exhibits periods of
+  particularly low memory demands between the bursts.}
+\label{fig:memory_burst_multiplot}
+\end{figure}
+
+Figures \ref{fig:cores_burst_multiplot} and
+\ref{fig:memory_burst_multiplot} show the jobs' average cores and
+memory requirements in each of the buckets, for each of the four pools,
+respectively.
+As can be seen, different pools exhibit different magnitudes of bursts
+of jobs with high core or memory demands.
+Pool A is the most bursty in both dimensions; it is the only pool that
+had a bucket in which the average job core requirement is higher than
+2, and multiple buckets in which the average memory requirement is
+larger than 20 GB.
+
+Pool B exhibits sparse bursts of jobs with high core demands, but
+intense bursts of high memory requirements.
+Pool C exhibits continuous moderate core demands, and also relatively
+steady memory bursts.
+Finally, pool D has virtually no bursts of jobs requiring more than
+one core, but it does exhibit bursts of high memory demands, along
+with periods of particularly low memory requirements.
+
+
+\section{Comparing Heuristics}\label{sec:buckets}
+%--------------------------------
+
+To demonstrate the effectiveness of the different heuristics under different workloads 
+we performed the following experiment.
+We used the buckets described above, assigned all jobs in each bucket a submit
+time of 0, and gave each heuristic an opportunity to try and match, in simulation, 
+as many jobs as possible from each bucket on a small synthetic pool of
+empty machines (total of 512 cores);
+jobs that could not be matched were simply skipped.
+For each bucket we then counted the number of jobs matched by each heuristic, 
+and gave the winning heuristic(s) (the one(s) who matched the highest
+number of jobs) a point.
+
+%Given that each bucket contains tens of thousands of jobs, they
+%cannot all be assigned to machines.
+
+%We repeated the experiment four times: first on three homogeneous
+%clusters in which all machines use the same number of cores and
+%memory, and then on a heteserogeneous cluster containing a mixture of
+%machines from the aforementioned clusters.
+
+The results are shown in Figure \ref{fig:buckets}.
+As can be seen, \wfc\ significantly outperforms all other heuristics 
+(collecting the highest percentage of wins) in pool A. 
+It is also the best heuristic in pools B, C, and D, 
+but the differences there are smaller.
+There is little difference among \bfm, \wfm, and \bfc, although
+\wfm\ is consistently slightly better than the other two.
+Notably, for pool D where there is virtually no core fragmentation 
+as indicated in Figure \ref{fig:cores_burst_multiplot}
+there seems to be little difference between the performance of the
+different heuristics.
+
+%This may indicate that it is best to first spread out the jobs across
+%as many machines as possible.
+%In fact, when all jobs are serial, \wfc\ is essentially the same as
+%mapping jobs to machines in a round-robin manner.
+
+\begin{figure}\centering                      
+	\includegraphics[width=.9\textwidth]{figures/buckets-all-no-mf.eps}
+\caption{\label{fig:buckets}Percentage of wins by each heuristic:
+  \wfc\ significantly outperforms the other heuristics in pool A. The
+  differences in pools B, C, and D are smaller.}
+\end{figure}
+
+An important observation is that though \wfc\ appears to be the preferred heuristic, 
+it did \textit{not} win in all cases. 
+This is shown by the gap between the \wfc\ bars 
+and the 100\% mark, indicating that in 6--37\% of the experiments
+other heuristics performed better. 
+These gaps are the motivation for the \mif\ heuristic
+proposed next. 
+
+
+\chapter{\mif}
+%=============
+\label{sec:mixed-fit}
+
+As demonstrated in the previous section, none of the one-dimensional
+heuristics is capable of maximizing the number of matched jobs under
+all workload scenarios.
+In this section we propose a new heuristic, \mif, that takes into
+account both cores and memory in an attempt to overcome the problem.
+
+
+\section{Balanced Resource Usage}
+%-----------------------------------
+
+The basic idea behind \mif\ is to try and reach balanced resource
+utilization across both cores and memory.
+This is achieved by considering the \textit{configured} ratio of cores
+to memory on each machine, and matching the job with the machine on
+which the ratio of \textit{used} cores to memory, together with this
+job, is closest to the configured ratio.
+
+To see how this is done, envision a grid representing possible
+resource combinations (as was done in Figures \ref{fig:wf_better} and
+\ref{fig:bf_better}).
+Each column represents a CPU core, and each row a block of memory (the
+sizes of such blocks are not really important as long as they are used
+consistently; they should correspond to the smallest unit being
+allocated).
+Assuming that cores and memory blocks are assigned exclusively to
+jobs, an allocation may be portrayed as a sequence of shaded squares
+on this grid, where each job is represented by a sequence of
+memory-squares in a specific core-column.
+
+The configured ratio is represented by the diagonal of this grid, and
+the used ratio by the line connecting the top-right point of the grid
+with the top-right point of the last job.
+\mif\ defines a parameter, $\alpha$, that denotes the angle between
+these two lines.
+Note that the used ratio is calculated after allocating the job being
+considered, so machines on which this job does not fit are excluded
+from the discussion.
+\mif\ then matches the job with the machine with the minimal $\alpha$
+value.
+In case of a tie, the first machine with the minimal value is used.
+
+Two important notes. First, The grid is drawn such that memory and
+cores are normalized to the same scale in each machine separately, thereby
+creating a square.
+This prevents the scale from affecting the angle.
+Second, the angle is based on lines emanating from the top right corner.
+It is also possible to have a similar definition based on the origin
+(i.e.\ the bottom-left corner).
+Choosing the top-right corner leads to higher sensitivity when the
+machine is loaded, which facilitates better precision in balancing the
+resources in such cases.
+
+Let's see an example. 
+Three machines are available, each with 4 cores and 32 GB of memory.
+Machine A already has one job with 24 GB, Machine B has 2 jobs
+with 8 GB each, and Machine C has one job with 2 cores and 4 GB memory
+and another job with 1 core and 4 GB memory.
+The next job that arrives requires one core and 8 GB of memory.
+The various $\alpha$ values of all three machines including the newly
+arrived job are demonstrated in Figure \ref{fig:fig3}.
+The machine selected by \mif\ in this case is B where
+$\alpha=0$.
+
+\begin{figure}\centering
+	\includegraphics[width=0.75\textwidth]{figures/fig3.eps}
+\caption{Example of various $\alpha$ angles calculated by \mif. The
+selected machine in this case is B where $\alpha=0$.}
+\label{fig:fig3}
+\end{figure}
+
+To demonstrate why this may be expected to improve over the previous
+heuristics we will use the same examples we used above.
+Consider Figure \ref{fig:wf_better}, where \wof\ yielded the best
+match.
+After matching the first 16 GB job with machine A, \mif\ will 
+match the second 16 GB job with machine B, as this will lead to a
+smaller $\alpha$ value as can be seen in Figure \ref{fig:fig4}.
+It will then match the remaining 4 GB jobs with both machines
+until all cores get utilized.
+As can be seen in Figure \ref{fig:mf_final} the end result is identical
+to \wof.
+
+\begin{figure}\centering
+\subfigure[\label{fig:fig4}Options for placing the 2'nd job. The angle
+  on machine B is smaller.]{
+	\includegraphics[width=0.45\textwidth]{figures/fig4.eps}}
+~~~~
+\subfigure[\label{fig:mf_final}Final allocation by \mif.]{
+\includegraphics[width=0.45\textwidth]{figures/fig1b.eps}}
+\caption{\mif\ behavior for the example in Figure \ref{fig:wf_better}.
+  The end result is identical to \wof.}
+\end{figure}
+
+%\begin{figure}\centering
+%	\includegraphics[width=0.45\textwidth]{figures/fig1b.eps}
+%\caption{Jobs allocated by \mif\ for Example 1.}
+%\label{fig:mf_final}
+%\end{figure}
+
+Next, lets re-examine Figure \ref{fig:bf_better} where \bef\ yielded the
+best results.
+In this scenario \mif\ will match the first three 8 GB jobs with
+machine A, and then the 32 GB job with machine B, replicating the
+behavior of \bef.
+Note that $\alpha$ would have been the same for the second 8 GB,
+whether it would have been matched on machine A or B.
+But as noted above, in such cases the \fif\ heuristics is used as a
+tie breaker and hence the job is matched with machine A.
+As can be seen in Figure \ref{fig:mf_final2} the end result is
+identical to \bef.
+
+\begin{figure}\centering
+	\includegraphics[width=0.45\textwidth]{figures/fig2b.eps}
+\caption{Jobs allocated by \mif\ for the Example in Figure
+  \ref{fig:bf_better}.
+  The result is identical to \bef.}
+\label{fig:mf_final2}
+\end{figure}
+
+
+\section{\mif's Results}
+%------------------------------
+
+To check the performance of \mif\ we repeated the buckets 
+experiment from Section \ref{sec:buckets}, 
+but this time including \mif\ in the set of competing heuristics.
+The results are shown in Figure \ref{fig:buckets-all}.
+As can be seen, \mif\ wins by only a small margin in pool A, 
+performs similarly to \wfc\ in pools B and D, and is slightly outperformed by \wfc\ 
+in pool C.
+
+\begin{figure}\centering
+	\includegraphics[width=.9\textwidth]{figures/buckets-all.eps}
+\caption{Percentage of wins by each heuristic: \mif\ wins by only a
+  small margin in pool A, performs similarly to \wfc\ in pools B and
+  D, and is slightly outperformed by \wfc\ in pool C.}
+\label{fig:buckets-all}
+\end{figure}
+
+These results are counterintuitive, since in a two-dimensional
+environment of cores and memory, where both resources are subject to
+sudden deflation by bursts of jobs with high demands, a reasonable
+strategy would be to try and balance the usage between the resources,
+in order to secure a safety margin against bursts of any kind.
+This strategy, however, which \mif\ employs, seems to yield some
+improvement only under the most bursty situations (pool A).
+This leads us to default to a meta-heuristic, \maj, which is described
+next.
+
+%To try and quantify the magnitude of this gap, we checked how many
+%jobs were scheduled in buckets that \mif\ did not have the best schedule.
+%In each such bucket, we measured the delta of jobs between the best
+%algorithm in that particular bucket and \mif.
+%Figure \ref{fig:mf-damage} shows the results.
+%The results are that
+%in those cases where \mif\ is not the best, \mif\ schedules 25--48
+%jobs less than the best algorithm on average, which is around 0.25\%
+%of the pool capacity.
+%In other words, the difference was insignificant and \mif\ was very
+%close to the best result.
+
+%\begin{figure}\centering
+%	\includegraphics[width=0.45\textwidth]{figures/mf-damage.eps}
+%\caption{Number of jobs the best algorithm schedules more than \mif\, in the
+%cases that \mif\ was not the best.}
+%\label{fig:mf-damage}
+%\end{figure}
+
+
+\chapter{The \maj\ Meta-Heuristic}
+%=================================
+\label{sec:max-jobs}
+
+The experiment described above indicates that counterintuitively, 
+\mif\ does not yield the best performance in all pools.
+As an alternative, we therefore suggest the use of the \maj\ meta-heuristic.
+
+%[Dror - lets leave that (how real systems work) to when we describe the load results, which are also different from the buckets].
+%While the experiments done above indicate that \mif\ should provide
+%good performance, they are conducted in a highly artificial setting:
+%a large number of jobs is scheduled at once on a previously empty
+%pool.
+%But real systems work in an on-line setting, suffering from
+%fragmentation and lack of information regarding future events.
+%As results described below show, in such realistic situations
+%\mif\ does not always provide the best performance.
+%We therefore suggest the use of the \maj\ meta-heuristic.
+
+A meta-heuristic is an algorithm that employs other heuristics as
+subroutines.
+In our case, \maj\ uses all of the heuristics described before: \bfc,
+\bfm, \wfc, \wfm, and \mif.
+At each scheduling cycle, \maj\ picks the best schedule produced by
+any of these heuristics for this cycle.
+In other words, the meta-algorithm runs all the available heuristics
+as black-boxes and selects the one with the best result for the
+currently queued jobs.
+The target function defining ``best'' is maximizing the
+number of jobs assigned to machines in this cycle.
+Importantly, additional heuristics can be added later and the system
+will take advantage of them in those cases that they perform the best.
+
+Pseudo-code for the \maj\ meta-heuristic is given in Figure
+\ref{fig:max-jobs}.
+
+\begin{figure}\centering
+\fbox{\parbox{7cm}{
+    \begin{tabbing}
+    xx\=xxxxx\=xxxxx\=\+\kill
+    L -- list of heuristics\\
+    S -- list of proposed schedules (mapping jobs to hosts)\\[3mm]
+
+    foreach heuristic H in L\\
+    \> S[H] = H.Schedule(waitingQueue)\\
+    maxJobsSchedule = MaxJobsSchedule(S)\\
+    Dispatch(maxJobsSchedule)
+    \end{tabbing}
+}~~}
+  \caption{The \maj\ meta-heuristic.}
+  \label{fig:max-jobs}
+\end{figure}
+
+
 
 
 
