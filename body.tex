@@ -622,3 +622,201 @@ Pseudo-code for the \maj\ meta-heuristic is given in Figure
   \label{fig:max-jobs}
 \end{figure}
 
+
+\chapter{Simulation Results}
+%===========================
+\label{sec:sim_results}
+
+To experiment with \maj, \mif\ and the rest of the heuristics, we
+developed a Java-based event-driven simulator \cite{simba} that mimics the
+matching behavior at the PPM.
+The simulator accepts as input a jobs trace file, 
+a machines configuration file, and a parameter defining which matching heuristic
+to apply.
+It first loads the two files into memory, building an event queue of
+job arrival events sorted according to the timestamps from the trace 
+(hence preserving the original arrival order and inter-arrival times of the jobs), 
+and a list of machine objects according to the configuration.
+
+The scheduling function is invoked by the scheduler at regular
+intervals, as is commonly done in many large-scale systems.
+In our simulations we used an interval of 30 seconds.
+This allows the scheduling overhead to be amortized over multiple jobs
+that are handled at once, 
+and may also facilitate better assignments of jobs to machines, because
+the scheduler can optimize across a large number of jobs rather than
+treating them individually.
+
+In each scheduling cycle, the scheduler begins by picking the first
+arrival event from the queue and trying to match a machine to the
+arriving job using the selected heuristic\footnote{For simplicity we skipped the fair-share calculation.}.
+If the matching succeeds the job is marked as ``running'' on the
+selected machine, and a completion event is scheduled in the event
+queue at a timestamp corresponding to the current time plus the job's
+duration from the trace.
+Otherwise a reservation is made for the job.
+Specifically the machine with the highest available memory is reserved
+for the job for its future execution, thus preventing other jobs from
+being scheduled to that machine during the rest of the scheduling cycle. 
+
+%During scheduling in simulator, jobs where sorted by their arrival order. We
+%selected that startegy rather than mimic that actual fairshare allocation that
+%happened at PPM for simplicity. The fairshare calculation was out of the scope
+%for our paper.
+
+For the workload we used the traces that were described in Section
+\ref{sec:matching}, and which contains 9--13 million jobs each.
+The parameters we used from the traces are the jobs' arrival times,
+runtime duration, and the number of cores and amount of memory each
+job requires in order to execute (see Figures
+\ref{fig:cores_usage_multiplot} and \ref{fig:memory_usage_multiplot}
+for the distributions).
+For the machines we used a special \nb\ command to query the present
+machine configurations from each of the pools on which the traces were
+collected.
+
+Our initial simulations revealed that
+the original load in the traces is too low for the wait queue in the
+simulated PPM to accumulate a meaningful number of jobs.
+This may stem from fact that the load in the month in which the traces
+were collected was particularly low, or that the configuration
+has changed by the time we ran the machines query (a few months later). 
+%fact that we included machines that were actually not usable.
+In any case the results were that all heuristics performed the same. 
+
+To overcome this problem we increased the load by multiplying the jobs
+arrival time by a factor, $\beta$, that is less than or equal to one.
+The smaller the value of $\beta$, the smaller the inter-arrival times
+become between the jobs, which increases the rate of incoming jobs and
+the load on the simulated pool. 
+We ran high-load simulations with $\beta$ 
+values ranging between 0.58--0.95. In the figures below, we translate the
+$\beta$ values into an actual load percentage for each pool.
+
+Metrics that were measured are the average wait time of jobs, the
+average slowdown, and the average length of the waiting queue during the
+simulation.
+The results are shown in Figures \ref{fig:avg-wait-with-max-jobs} to
+\ref{fig:avg-waitqueue-with-max-jobs}, for each metric, respectively.
+Since the metrics are dependent and the results are similar between the metrics, 
+we will only discuss the differences between the heuristics and pools.
+
+%\begin{figure}\centering
+%	\includegraphics[width=0.9\textwidth]{figures/avg-wait.eps}
+%\caption{Average wait time of jobs.}
+%\label{fig:avg-wait}
+%\end{figure}
+
+%\begin{figure}\centering
+%	\includegraphics[width=0.9\textwidth]{figures/avg-slowdown.eps}
+%\caption{Average slowdown of jobs.}
+%\label{fig:avg-slowdown}
+%\end{figure}
+
+%\begin{figure}\centering
+%	\includegraphics[width=0.9\textwidth]{figures/avg-waitqueue.eps}
+%\caption{Average wait-queue length.}
+%\label{fig:avg-waitqueue}
+%\end{figure}
+
+\begin{figure}\centering
+	\includegraphics[width=1.0\textwidth]{figures/avg-wait-with-max-jobs.eps}
+\caption{Average wait time of jobs.
+System load is expressed as percent of capacity.}
+\label{fig:avg-wait-with-max-jobs}
+\end{figure}
+
+\begin{figure}\centering
+	\includegraphics[width=1.0\textwidth]{figures/avg-slowdown-with-max-jobs.eps}
+\caption{Average slowdown of jobs.}
+\label{fig:avg-slowdown-with-max-jobs}
+\end{figure}
+
+\begin{figure}\centering
+	\includegraphics[width=1.0\textwidth]{figures/avg-waitqueue-with-max-jobs.eps}
+\caption{Average wait-queue length.}
+\label{fig:avg-waitqueue-with-max-jobs}
+\end{figure}
+
+In correlation with the buckets experiment in Figure \ref{fig:buckets-all}, 
+\mif\ showed marked improvement over the other heuristics in pool A, 
+and was able to reduce the waiting time by 22\%, slowdown by 23\%, and queue
+length by 22\% under the highest loads simulated.
+
+
+The second-best heuristic on pool A, \bfm, appears to slightly outperform \mif\ 
+in pool B, especially in the mid-range load, as opposed to the buckets
+experiment.
+This may be caused by the fact that pool B had the most intense bursts
+of high memory demands and the largest fraction of 4 GB jobs, making
+the conservation of memory resources of prime importance.
+At the same time, \bfm\ performs relatively poorly on pool D.
+
+Similarly, \wfc\ that was the best heuristic in the buckets experiment
+(except for \mif) appears to perform poorly in the load simulation in
+both pools A and B.
+This may stem from the fact that the buckets experiments were 
+conducted in a highly artificial setting where all jobs were presented
+in advance, and were matched to empty clusters of machines.
+In such a scenario \wfc\ --- which is similar to round-robin
+allocation --- performed well, but when confronted with a continuous
+on-line scenario, where machines typically already have some of their
+resources taken, it did not.
+This is another indication that challenges faced by on-line schedulers are
+different from those faced by batch (or off-line) schedulers, and that
+it is important to match the simulation type to the system type.
+In our case this means that the dynamic simulations described here are
+more relevant than the bucket experiments used above.
+
+In pool C all the heuristics achieved essentially the same performance.
+This reflects an unchallenging workload that can be handled by any heuristic.
+
+Finally, in pool D \mif\ had similar results to the second best heuristic, \wfc.
+It looks like the non-bursty nature of that pool gives an advantage to balancing
+heuristics such as \wfc. 
+
+%We therefor do not discuss pool D any more.
+%of high memory usage jobs.
+%\wfc\ was one of the worst heuristics, in contrast with its good
+%performance in the bucket experiments described before.
+%This indicates that the challenges faced by on-line schedulers are
+%different from those faced by batch (or off-line) schedulers, and that
+%it is important to match the simulation type to the system type.
+%In our case this means that the dynamic simulations described here are
+%more relevant than the bucket simulations used above.
+
+Figure \ref{fig:max-jobs-selected} shows the fraction of
+times each heuristic was selected by \maj.
+As can be seen, \mif\ is dominant, even more than in the
+above buckets experiment, but still getting as low as 73\%
+in pool A.
+\bfm\ is markedly better than \wfc\ especially in pools A and D.
+
+\begin{figure}\centering
+	\includegraphics[width=0.9\textwidth]{figures/max-jobs-selected.eps}
+\caption{Selected heuristics by \maj.
+Sum is more than 100\% because in many cases several heuristics
+produced the same result.}
+\label{fig:max-jobs-selected}
+\end{figure}
+
+%Generally, \mif\ performed well in Pool A where bursts of cores and memory
+%requirements were noticable. In other pools, \mif\ was similar or event worse
+%compared to the best hueristic. 
+
+As expected, the \maj\ meta-heuristic is the
+best scheme all around, and seems to be largely robust against workload and configuration variations.
+This is due to the fact that it uses the best heuristic at each
+scheduling cycle.
+However, its final result (in terms of average performance across all
+the jobs in the trace) is not necessarily identical to that of the
+best heuristic that it employs.
+On one hand, \maj\ can be better than each individual heuristic, as
+happens for example in pool B.
+This is probably because it can mix them as needed, and use a
+different heuristic for different situations as they occur.
+On the other hand, \maj\ is sometimes slightly inferior to the best
+individual heuristic, as seen for example in pool A.
+This is probably due to situations in which packing jobs very densely
+leads to reduced performance in a successive scheduling round.
+
