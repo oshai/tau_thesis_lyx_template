@@ -341,4 +341,59 @@ one core, but it does exhibit bursts of high memory demands, along
 with periods of particularly low memory requirements.
 
 
+\section{Comparing Heuristics}\label{sec:buckets}
+%--------------------------------
+
+To demonstrate the effectiveness of the different heuristics under different workloads 
+we performed the following experiment.
+We used the buckets described above, assigned all jobs in each bucket a submit
+time of 0, and gave each heuristic an opportunity to try and match, in simulation, 
+as many jobs as possible from each bucket on a small synthetic pool of
+empty machines (total of 512 cores);
+jobs that could not be matched were simply skipped.
+For each bucket we then counted the number of jobs matched by each heuristic, 
+and gave the winning heuristic(s) (the one(s) who matched the highest
+number of jobs) a point.
+
+%Given that each bucket contains tens of thousands of jobs, they
+%cannot all be assigned to machines.
+
+%We repeated the experiment four times: first on three homogeneous
+%clusters in which all machines use the same number of cores and
+%memory, and then on a heteserogeneous cluster containing a mixture of
+%machines from the aforementioned clusters.
+
+The results are shown in Figure \ref{fig:buckets}.
+As can be seen, \wfc\ significantly outperforms all other heuristics 
+(collecting the highest percentage of wins) in pool A. 
+It is also the best heuristic in pools B, C, and D, 
+but the differences there are smaller.
+There is little difference among \bfm, \wfm, and \bfc, although
+\wfm\ is consistently slightly better than the other two.
+Notably, for pool D where there is virtually no core fragmentation 
+as indicated in Figure \ref{fig:cores_burst_multiplot}
+there seems to be little difference between the performance of the
+different heuristics.
+
+%This may indicate that it is best to first spread out the jobs across
+%as many machines as possible.
+%In fact, when all jobs are serial, \wfc\ is essentially the same as
+%mapping jobs to machines in a round-robin manner.
+
+\begin{figure}\centering                      
+	\includegraphics[width=.9\textwidth]{figures/buckets-all-no-mf.eps}
+\caption{\label{fig:buckets}Percentage of wins by each heuristic:
+  \wfc\ significantly outperforms the other heuristics in pool A. The
+  differences in pools B, C, and D are smaller.}
+\end{figure}
+
+An important observation is that though \wfc\ appears to be the preferred heuristic, 
+it did \textit{not} win in all cases. 
+This is shown by the gap between the \wfc\ bars 
+and the 100\% mark, indicating that in 6--37\% of the experiments
+other heuristics performed better. 
+These gaps are the motivation for the \mif\ heuristic
+proposed next. 
+
+
 
