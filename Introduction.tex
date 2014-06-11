@@ -199,4 +199,34 @@ These observations are consistent across the pools.
 %\end{figure}
 
 
+The two ways to sort the machines by available cores or memory are in
+increasing or decreasing order.
+Sorting them by \textit{increasing} amount of free cores or memory and
+selecting the first machine on which the job fits effectively
+implements the \bef\ heuristic.
+\bef\ is known to result in a better packing of jobs, while
+maintaining unbalanced cores (or memory) usage across the machines in
+anticipation for future jobs with high resource requirements.
+Sorting the machines by \textit{decreasing} amount of free cores or
+memory implements the \wof\ heuristic.
+\wof's advantage is in keeping resource usage balanced across
+machines, which is particularly useful for mostly-homogeneous
+workloads.
+For completeness we also mention \fif.
+\fif's advantage is in its simplicity, as it does not require the
+sorting of the machines.
+Our tests, however, revealed that it performs poorly in our
+environment, so we do not refer to it further in this paper.
+
+We argue that no single heuristic, when applied to a single resource in
+isolation, can yield optimal performance under all workload
+scenarios.
+To demonstrate our point we begin by providing simple synthetic examples
+showing how different heuristics match different number of jobs under
+different workload conditions.
+We then put theory to the test by running simulations on the
+aforementioned traces, demonstrating the effectiveness of the different heuristics 
+under different workloads.
+
+
 
