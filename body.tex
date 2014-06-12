@@ -42,8 +42,8 @@ purchase different amounts of servers to be used for their jobs.
 These purchases eventually reflect their share of the combined
 resources.
 Once the shares are calculated, they are propagated to the PPMs where
-they are physically enforced. (The calculation and propagation
-mechanisms are beyond our scope.)
+they are physically enforced. The calculation and propagation
+mechanisms are beyond our scope.
 
 To enforce fair-share the PPM constantly monitors which jobs from
 which projects are currently running and the amount of resources they
@@ -109,6 +109,7 @@ by up to 22\% for all jobs in average under high loads.
 %that are very close to those of \maj.
 
 The rest of this work is organized as follows.
+Section \ref{sec:traces} reviews the traces that were collected from Intel's pools.
 Section \ref{sec:matching} provides more details on the problem of
 matching machines to jobs, and explores the performance of commonly
 used heuristics.
@@ -118,7 +119,73 @@ and simulation results in Section \ref{sec:sim_results}.
 Section \ref{sec:related} briefly presents related work, and Section
 \ref{sec:conclusions} concludes.
 
+\chapter{Workload Survey}
+%==================================
+\label{sec:traces}
+In order to perform the simulations that will be described later, 
+we conducted a survey of the jobs that were executed in \nb\ during a one month period.
+The following section describes the traces of jobs that were collected.
 
+When a job finshes it's execution in \nb\, it is reported to a database 
+with all the information that was gathered during execution.
+That data is then stored for few month for users introspection. Later, the data is 
+aggregated by business analysis requirments, while the original data is dropped.
+We collected the data of job execution couple of month after these jobs were finished 
+and before the data was deleted.
+
+\begin{table}
+\begin{tabular}{|c|c|c|}
+\hline 
+row 1 & cell 1 & cell 2\tabularnewline
+\hline 
+\hline 
+row 2 & cell 1 & cell 2\tabularnewline
+\hline 
+\end{tabular}
+\caption{Table float first using Insert - > Float -> Table}
+\label{tab:jobs_properties}
+\end{table}
+
+The data was collected from four of Intel's largest pools at different locations across the Intel farm. 
+These pools were labeled A, B, C and D.
+The recorded data contains one month period of jobs, and is stored in the 
+Parallel Workload Archive \cite{parallel13}.
+Table \ref{tab:jobs_properties} describes the properties of the recorded data.
+
+\begin{figure}[p]\centering
+	\includegraphics{figures/cores_multiplot.eps}
+\caption{Jobs' cores requirements: the vast majority of the jobs are
+  serial and require a single CPU core in order to execute.}
+\label{fig:cores_usage_multiplot}
+	\includegraphics{figures/memory_multiplot.eps}
+\caption{Jobs' memory requirements: demands are mostly 8 GB and below,
+  but there are jobs that require 16 GB, 32 GB or even more memory in
+  order to execute.}
+\label{fig:memory_usage_multiplot}
+\end{figure}
+
+Figures \ref{fig:cores_usage_multiplot} and \ref{fig:memory_usage_multiplot}
+show the distribution of the jobs' cores and memory requirements in four large pools %
+\footnote{The requirements are specified as part of the job profile at submit time.}.
+The data comes from traces \cite{parallel13} that were collected at the PPM
+level during a one-month period, and which contain up to 13 million jobs each.
+As can be seen in the figures, the vast majority of the jobs are
+serial (single-thread jobs, requiring a single CPU core in order to execute).
+Memory requirements are mostly 8 GB and below, but there are jobs that
+require 16 GB, 32 GB, or even more memory (not shown) in order to
+execute.
+These observations are consistent across the pools.
+
+%Figure \ref{fig:cores_mem_dist} shows the distribution of the jobs' cores and memory requirements in one of Intel's largest pools. The data comes from a trace that was collected during a one-month period and which contains more than 13 million jobs. As can be seen in Figure \ref{fig:cores_dist}, the vast majority of the jobs are serial and require a single CPU core in order to execute. Memory demands are mostly 8GB and below, but there are jobs that require 16GB, 32GB, or even more memory (not shown) in order to execute.
+
+%\begin{figure}\centering
+%\subfigure[\label{fig:cores_dist}Jobs' cores requirements]{
+%	\includegraphics[width=0.45\textwidth]{figures/cores.eps}}
+%\subfigure[\label{fig:mem_dist}Jobs' memory requirements]{
+%	\includegraphics[width=0.45\textwidth]{figures/memory.eps}}
+%\caption{Jobs' cores and memory requirements: (a) the vast majority of the jobs are serial and require a single CPU core in order to execute. (b) Memory demands are mostly 8GB and below, but there are jobs that require 16GB, 32GB or even more memory in order to execute.}
+%\label{fig:cores_mem_dist}
+%\end{figure}
 
 \chapter{Matching Machines to Jobs}
 %==================================
@@ -143,10 +210,6 @@ present time are small.
 The only added difficulty in supporting such jobs is the need to
 allocate multiple machines at once instead of one at a time.
 
-%Selecting the optimal match of jobs to machines is difficult problem that
-%may be time consuming. Since scheduling cycles are short, and  \nb\
-%strive to reduce the overhead of that calculation, a heuristic is employed
-%to sort the machines. 
 There are many criteria by which the machines can be sorted.
 In this work we focus on the number of free cores and amount of free
 memory, as this suits well the workload in Intel which is
@@ -155,49 +218,6 @@ Though I/O is definitely a factor, and some jobs do perform large file
 operations, there are some in-house solutions that are beyond the
 scope of this work that greatly reduce the I/O burden on the
 machines.
-
-\begin{figure}[p]\centering
-%	\includegraphics[width=.9\textwidth]{figures/cores_multiplot.eps}
-	\includegraphics{figures/cores_multiplot.eps}
-\caption{Jobs' cores requirements: the vast majority of the jobs are
-  serial and require a single CPU core in order to execute.}
-\label{fig:cores_usage_multiplot}
-%\end{figure}
-%\begin{figure}\centering
-%	\includegraphics[width=1.0\textwidth]{figures/memory_multiplot.eps}
-	\includegraphics{figures/memory_multiplot.eps}
-\caption{Jobs' memory requirements: demands are mostly 8 GB and below,
-  but there are jobs that require 16 GB, 32 GB or even more memory in
-  order to execute.}
-\label{fig:memory_usage_multiplot}
-\end{figure}
-
-%At Intel, job is a process that is submitted with a definition of
-%processors and memory requirements for its execution. Job can be parallel and
-%require one or few cores, and a specific amount of memory in GB. 
-Figures \ref{fig:cores_usage_multiplot} and \ref{fig:memory_usage_multiplot}
-show the distribution of the jobs' cores and memory requirements in four large pools at different locations across the Intel farm%
-\footnote{The requirements are specified as part of the job profile at submit time.}.
-The data comes from traces \cite{parallel13} that were collected at the PPM
-level during a one-month period, and which contain up to 13 million jobs each.
-As can be seen in the figures, the vast majority of the jobs are
-serial (single-thread jobs, requiring a single CPU core in order to execute).
-Memory requirements are mostly 8 GB and below, but there are jobs that
-require 16 GB, 32 GB, or even more memory (not shown) in order to
-execute.
-These observations are consistent across the pools.
-
-%Figure \ref{fig:cores_mem_dist} shows the distribution of the jobs' cores and memory requirements in one of Intel's largest pools. The data comes from a trace that was collected during a one-month period and which contains more than 13 million jobs. As can be seen in Figure \ref{fig:cores_dist}, the vast majority of the jobs are serial and require a single CPU core in order to execute. Memory demands are mostly 8GB and below, but there are jobs that require 16GB, 32GB, or even more memory (not shown) in order to execute.
-
-%\begin{figure}\centering
-%\subfigure[\label{fig:cores_dist}Jobs' cores requirements]{
-%	\includegraphics[width=0.45\textwidth]{figures/cores.eps}}
-%\subfigure[\label{fig:mem_dist}Jobs' memory requirements]{
-%	\includegraphics[width=0.45\textwidth]{figures/memory.eps}}
-%\caption{Jobs' cores and memory requirements: (a) the vast majority of the jobs are serial and require a single CPU core in order to execute. (b) Memory demands are mostly 8GB and below, but there are jobs that require 16GB, 32GB or even more memory in order to execute.}
-%\label{fig:cores_mem_dist}
-%\end{figure}
-
 
 The two ways to sort the machines by available cores or memory are in
 increasing or decreasing order.
@@ -396,7 +416,7 @@ These gaps are the motivation for the \mif\ heuristic
 proposed next. 
 
 
-\chapter{\mif}
+\chapter{The \mif Heuristic}
 %=============
 \label{sec:mixed-fit}
 
