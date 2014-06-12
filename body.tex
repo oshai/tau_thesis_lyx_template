@@ -134,23 +134,28 @@ We collected the data of job execution couple of month after these jobs were fin
 and before the data was deleted.
 
 \begin{table}
-\begin{tabular}{|c|c|c|}
+\begin{tabular}{|c|c|c|c|c|}
 \hline 
-row 1 & cell 1 & cell 2\tabularnewline
+ & Pool A & Pool B & Pool C & Pool D\tabularnewline
 \hline 
 \hline 
-row 2 & cell 1 & cell 2\tabularnewline
+Dates &  & & & &\tabularnewline
+\hline 
+# of jobs &  & & & &\tabularnewline
+\hline 
+# of machines &  & & & &\tabularnewline
 \hline 
 \end{tabular}
 \caption{Table float first using Insert - > Float -> Table}
 \label{tab:jobs_properties}
 \end{table}
 
-The data was collected from four of Intel's largest pools at different locations across the Intel farm. 
+The data comes from traces \cite{parallel13} that were collected at the PPM
+level during a one-month period, and which contain up to 13 million jobs each.
+The data was collected from four of Intel's largest pools at different locations. 
 These pools were labeled A, B, C and D.
-The recorded data contains one month period of jobs, and is stored in the 
-Parallel Workload Archive \cite{parallel13}.
-Table \ref{tab:jobs_properties} describes the properties of the recorded data.
+The data is stored and available for free use in the Parallel Workload Archive \cite{parallel13}.
+Table \ref{tab:jobs_properties} describes general properties of the recorded data.
 
 \begin{figure}[p]\centering
 	\includegraphics{figures/cores_multiplot.eps}
@@ -165,10 +170,8 @@ Table \ref{tab:jobs_properties} describes the properties of the recorded data.
 \end{figure}
 
 Figures \ref{fig:cores_usage_multiplot} and \ref{fig:memory_usage_multiplot}
-show the distribution of the jobs' cores and memory requirements in four large pools %
+show the distribution of the jobs' cores and memory requirements
 \footnote{The requirements are specified as part of the job profile at submit time.}.
-The data comes from traces \cite{parallel13} that were collected at the PPM
-level during a one-month period, and which contain up to 13 million jobs each.
 As can be seen in the figures, the vast majority of the jobs are
 serial (single-thread jobs, requiring a single CPU core in order to execute).
 Memory requirements are mostly 8 GB and below, but there are jobs that
@@ -176,16 +179,7 @@ require 16 GB, 32 GB, or even more memory (not shown) in order to
 execute.
 These observations are consistent across the pools.
 
-%Figure \ref{fig:cores_mem_dist} shows the distribution of the jobs' cores and memory requirements in one of Intel's largest pools. The data comes from a trace that was collected during a one-month period and which contains more than 13 million jobs. As can be seen in Figure \ref{fig:cores_dist}, the vast majority of the jobs are serial and require a single CPU core in order to execute. Memory demands are mostly 8GB and below, but there are jobs that require 16GB, 32GB, or even more memory (not shown) in order to execute.
 
-%\begin{figure}\centering
-%\subfigure[\label{fig:cores_dist}Jobs' cores requirements]{
-%	\includegraphics[width=0.45\textwidth]{figures/cores.eps}}
-%\subfigure[\label{fig:mem_dist}Jobs' memory requirements]{
-%	\includegraphics[width=0.45\textwidth]{figures/memory.eps}}
-%\caption{Jobs' cores and memory requirements: (a) the vast majority of the jobs are serial and require a single CPU core in order to execute. (b) Memory demands are mostly 8GB and below, but there are jobs that require 16GB, 32GB or even more memory in order to execute.}
-%\label{fig:cores_mem_dist}
-%\end{figure}
 
 \chapter{Matching Machines to Jobs}
 %==================================
@@ -416,7 +410,7 @@ These gaps are the motivation for the \mif\ heuristic
 proposed next. 
 
 
-\chapter{The \mif Heuristic}
+\chapter{The \mif\ Heuristic}
 %=============
 \label{sec:mixed-fit}
 
