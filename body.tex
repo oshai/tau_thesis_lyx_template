@@ -32,7 +32,7 @@ and distribute them to the different PPMs in order to spread the load
 across the farm.
 Together, these two layers, VPMs at the top and PPMs at the
 bottom, strive to utilize every compute resource across the farm.
-This paper focuses on the work done at the PPM level.
+This work focuses on the work done at the PPM level.
 
 A basic requirement in \nb\ is the enforcement of fair-share
 scheduling among the various projects and business units within Intel
@@ -43,7 +43,7 @@ These purchases eventually reflect their share of the combined
 resources.
 Once the shares are calculated, they are propagated to the PPMs where
 they are physically enforced. (The calculation and propagation
-mechanisms are beyond the scope of this paper.)
+mechanisms are beyond our scope.)
 
 To enforce fair-share the PPM constantly monitors which jobs from
 which projects are currently running and the amount of resources they
@@ -79,7 +79,7 @@ and needs.
 while the pool administrator can set a default policy to be used for
 all jobs.
 
-In this paper we argue that no heuristic applied to a
+In this work we argue that no heuristic applied to a
 single resource in isolation can yield optimal performance under all
 scenarios and cases.
 To demonstrate our point we use both simple test cases and workload
@@ -108,7 +108,7 @@ by up to 22\% for all jobs in average under high loads.
 %Interestingly, we also find that \mif\ produces scheduling decisions
 %that are very close to those of \maj.
 
-The rest of this paper is organized as follows.
+The rest of this work is organized as follows.
 Section \ref{sec:matching} provides more details on the problem of
 matching machines to jobs, and explores the performance of commonly
 used heuristics.
@@ -116,7 +116,7 @@ Section \ref{sec:mixed-fit} then describes the \mif\ heuristic,
 followed by the \maj\ meta-heuristic in Section \ref{sec:max-jobs},
 and simulation results in Section \ref{sec:sim_results}.
 Section \ref{sec:related} briefly presents related work, and Section
-\ref{sec:conclusions} concludes the paper.
+\ref{sec:conclusions} concludes.
 
 
 
@@ -148,12 +148,12 @@ allocate multiple machines at once instead of one at a time.
 %strive to reduce the overhead of that calculation, a heuristic is employed
 %to sort the machines. 
 There are many criteria by which the machines can be sorted.
-In this paper we focus on the number of free cores and amount of free
+In this work we focus on the number of free cores and amount of free
 memory, as this suits well the workload in Intel which is
 characterized by compute-intensive memory-demanding jobs.
 Though I/O is definitely a factor, and some jobs do perform large file
 operations, there are some in-house solutions that are beyond the
-scope of this paper that greatly reduce the I/O burden on the
+scope of this work that greatly reduce the I/O burden on the
 machines.
 
 \begin{figure}[p]\centering
@@ -216,7 +216,7 @@ For completeness we also mention \fif.
 \fif's advantage is in its simplicity, as it does not require the
 sorting of the machines.
 Our tests, however, revealed that it performs poorly in our
-environment, so we do not refer to it further in this paper.
+environment, so we do not refer to it further.
 
 We argue that no single heuristic, when applied to a single resource in
 isolation, can yield optimal performance under all workload
@@ -948,7 +948,7 @@ may yield significant improvements \cite{Shmueli05backfillingwith}.
 Matching jobs with resources is an NP-hard problem.
 The common practice is therefore to rely on heuristics to do the
 matching.
-In this paper we investigated the problem of resource matching in
+In this work we investigated the problem of resource matching in
 Intel's compute farm, and showed that none of the well-known
 heuristics such as \bef\ or \wof\ yield optimal performance in
 all workload scenarios and cases.
