@@ -148,7 +148,7 @@ Number of Machines & 1,633 & 3,115 & 1,499 & 2,692\tabularnewline
 Number of Cores & 16,588 & 33,300 & 18,816 & 40,372\tabularnewline
 \hline 
 \end{tabular}
-\caption{General properties of the collected traces.}
+\caption{General summary of the traces collected during one month period.}
 \label{tab:jobs_properties}
 \end{table}
 
@@ -156,7 +156,7 @@ The data comes from traces that were collected at the PPM
 level during a one-month period, and which contain up to 13 million jobs each.
 The data was collected from four of Intel's largest pools at different locations. 
 These pools were labeled A, B, C and D.
-The data is stored and available for free use in the Parallel Workload Archive \cite{parallel13}.
+The data is stored and available in the Parallel Workload Archive \cite{parallel13}.
 Table \ref{tab:jobs_properties} describes general properties of the recorded data.
 
 \begin{figure}[p]\centering
@@ -941,6 +941,15 @@ discrimination seems to be novel.
 It would be interesting to evaluate the effect of these details, but
 our results so far indicate that they may not have much impact for
 real workloads.
+
+Another approach for utilization improvment that was perviously introduced 
+is altering resources requirments that were introduced during job submission. 
+Yom-Tov And Aridor suggested reduction of memory requirments \cite{yomtov2008} . 
+This approach is orthgnal to ours, and can be combined in the same system altoghther.
+Tang et al.\ adjusted job's runtime estimates \cite{5470474} . This approach on the other hand, is not relevant to \nb\ .
+\nb\ scheduler uses transient reservations, hence there is not promise about the actual dispatch 
+time of jobs. In addition, our jobs did not have any runtime estimates during submission.
+
 
 Lee et al.\ investigated the problem of virtual machines allocation
 taking into consideration the consolidation of virtual machines onto
