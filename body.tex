@@ -942,14 +942,6 @@ It would be interesting to evaluate the effect of these details, but
 our results so far indicate that they may not have much impact for
 real workloads.
 
-Another approach for utilization improvment that was perviously introduced 
-is altering resources requirments that were introduced during job submission. 
-Yom-Tov And Aridor suggested reduction of memory requirments \cite{yomtov2008} . 
-This approach is orthgnal to ours, and can be combined in the same system altoghther.
-Tang et al.\ adjusted job's runtime estimates \cite{5470474} . This approach on the other hand, is not relevant to \nb\ .
-\nb\ scheduler uses transient reservations, hence there is not promise about the actual dispatch 
-time of jobs. In addition, our jobs did not have any runtime estimates during submission.
-
 
 Lee et al.\ investigated the problem of virtual machines allocation
 taking into consideration the consolidation of virtual machines onto
