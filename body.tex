@@ -126,6 +126,14 @@ In order to perform the simulations that will be described later,
 we conducted a survey of the jobs that were executed in \nb\ during a one month period.
 The following section describes the traces of jobs that were collected.
 
+\nb\ is a grid computing scheduling system. 
+There exist few similar grid cmputing systems: LSF \cite{platformlsf}, OracleGrid \cite{oracleGridEngine} and HTCondor \cite{htcondor}.
+\nb\ is an in-house solution that was implemented at Intel, and is tailord 
+for Intel's specific needs.
+
+As a grid computing system, \nb\ accepts jobs, 
+schedule to run it on one or more machines and manage all aspects of the job 
+execution environement.
 When a job finshes it's execution in \nb\ , it is reported to a database 
 with all the information that was gathered during execution.
 That data is then stored for few month for users introspection. Later, the data is 
