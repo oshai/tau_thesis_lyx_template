@@ -127,17 +127,17 @@ we conducted a survey of the jobs that were executed in \nb\ during a one month 
 The following section describes the traces of jobs that were collected.
 
 \nb\ is a grid computing scheduling system. 
-There exist few similar grid cmputing systems: LSF \cite{platformlsf}, OracleGrid \cite{oracleGridEngine} and HTCondor \cite{htcondor}.
-\nb\ is an in-house solution that was implemented at Intel, and is tailord 
+There exist few similar grid computing systems: LSF \cite{platformlsf}, OracleGrid \cite{oracleGridEngine} and HTCondor \cite{htcondor}.
+\nb\ is an in-house solution that was implemented at Intel, and is tailored 
 for Intel's specific needs.
 
 As a grid computing system, \nb\ accepts jobs, 
 schedule to run it on one or more machines and manage all aspects of the job 
-execution environement.
-When a job finshes it's execution in \nb\ , it is reported to a database 
+execution environment.
+When a job finishes it's execution in \nb\ , it is reported to a database 
 with all the information that was gathered during execution.
 That data is then stored for few month for users introspection. Later, the data is 
-aggregated by business analysis requirments, while the original data is dropped.
+aggregated by business analysis requirements, while the original data is dropped.
 We collected the data of job execution couple of month after these jobs were finished 
 and before the data was deleted.
 
@@ -163,7 +163,7 @@ Number of Cores & 16,588 & 33,300 & 18,816 & 40,372\tabularnewline
 The data comes from traces that were collected at the PPM
 level during a one-month period, and which contain up to 13 million jobs each.
 The data was collected from four of Intel's largest pools at different locations. 
-These pools were labeled A, B, C and D.
+These pools were labelled A, B, C and D.
 The data is stored and available in the Parallel Workload Archive \cite{parallel13} in original format and The Standard Workload Format\cite{swf1}.
 Table \ref{tab:jobs_properties} describes general properties of the recorded data.
 
@@ -206,8 +206,8 @@ list of machines are exhausted.
 At this point the PPM launches the chosen job(s) on the selected
 machine(s) and waits for the next scheduling cycle.
 
-A job may be multithreaded, but we assume that each job can fit on a
-single (multicore) machine.
+A job may be multi-threaded, but we assume that each job can fit on a
+single (multi-core) machine.
 In principle \nb\ also supports parallel jobs (called ``MPI jobs'')
 that span multiple machines, but in practice their numbers at the
 present time are small.
@@ -264,8 +264,8 @@ memory.
 As can be seen in Figure \ref{fig:wf_better_A}, \bef\ matches the first
 two jobs with machine A, totally exhausting its memory, and the next
 four jobs with machine B, thereby exhausting its cores.
-The end result is two unutilized cores on machine A, half the memory
-unutilized on machine B, and two jobs that remain pending at the PPM.
+The end result is two non-utilized cores on machine A, half the memory
+non-utilized on machine B, and two jobs that remain pending at the PPM.
 \wof\ on the other hand matches the first two jobs on different
 machines, which leaves enough free space (cores and memory) for all the
 remaining 6 jobs to be matched.
@@ -513,7 +513,7 @@ to \wof.
 ~~~~
 \subfigure[\label{fig:mf_final}Final allocation by \mif.]{
 \includegraphics[width=0.45\textwidth]{figures/fig1b.eps}}
-\caption{\mif\ behavior for the example in Figure \ref{fig:wf_better}.
+\caption{\mif\ behaviour for the example in Figure \ref{fig:wf_better}.
   The end result is identical to \wof.}
 \end{figure}
 
@@ -527,7 +527,7 @@ Next, lets re-examine Figure \ref{fig:bf_better} where \bef\ yielded the
 best results.
 In this scenario \mif\ will match the first three 8 GB jobs with
 machine A, and then the 32 GB job with machine B, replicating the
-behavior of \bef.
+behaviour of \bef.
 Note that $\alpha$ would have been the same for the second 8 GB,
 whether it would have been matched on machine A or B.
 But as noted above, in such cases the \fif\ heuristics is used as a
@@ -563,7 +563,7 @@ in pool C.
 \label{fig:buckets-all}
 \end{figure}
 
-These results are counterintuitive, since in a two-dimensional
+These results are counter-intuitive, since in a two-dimensional
 environment of cores and memory, where both resources are subject to
 sudden deflation by bursts of jobs with high demands, a reasonable
 strategy would be to try and balance the usage between the resources,
@@ -597,7 +597,7 @@ next.
 %=================================
 \label{sec:max-jobs}
 
-The experiment described above indicates that counterintuitively, 
+The experiment described above indicates that counter-intuitively, 
 \mif\ does not yield the best performance in all pools.
 As an alternative, we therefore suggest the use of the \maj\ meta-heuristic.
 
@@ -653,7 +653,7 @@ Pseudo-code for the \maj\ meta-heuristic is given in Figure
 
 To experiment with \maj, \mif\ and the rest of the heuristics, we
 developed a Java-based event-driven simulator \cite{simba} that mimics the
-matching behavior at the PPM.
+matching behaviour at the PPM.
 The simulator accepts as input a jobs trace file, 
 a machines configuration file, and a parameter defining which matching heuristic
 to apply.
@@ -676,7 +676,7 @@ arrival event from the queue and trying to match a machine to the
 arriving job using the selected heuristic\footnote{For simplicity we skipped the fair-share calculation.}.
 If the matching succeeds the job is marked as ``running'' on the
 selected machine, and a completion event is scheduled in the event
-queue at a timestamp corresponding to the current time plus the job's
+queue at a time-stamp corresponding to the current time plus the job's
 duration from the trace.
 Otherwise a reservation is made for the job.
 Specifically the machine with the highest available memory is reserved
@@ -871,8 +871,8 @@ This is similar to avoiding high $\alpha$ values in our terminology.
 The idea of symbiotic scheduling is also related to our work.
 Symbiotic scheduling attempts to find sets of jobs that complement
 each other and together use the system resources effectively.
-This was initiated in the context of hyperthreading (or simultaneous
-multithreading) processors \cite{snavely00,eyerman10},
+This was initiated in the context of hyper-threading (or simultaneous
+multi-threading) processors \cite{snavely00,eyerman10},
 and extended also to the domain of clusters \cite{weinberg06}.
 
 Meta-schedulers like the \maj\ approach have also been used before.
@@ -893,8 +893,8 @@ to scientific computing with various target functions for scheduling. \maj\ on
 the contrary, applies to batch systems and its target function is specified as
 maximizing the total number of running jobs.
 
-Reservations with online backfilling, such like was suggested by 
-Srinivasan et al.\cite{Srinivasan2002}, may ipmrove utilization and thruput.
+Reservations with on-line backfilling, such like was suggested by 
+Srinivasan et al.\cite{Srinivasan2002}, may improve utilization and throughput.
 However at Intel, reservations are preferred over backfilling so such an approach was not evaluated.
 
 It should be noted that due to the assumption that cores and memory
@@ -954,10 +954,10 @@ It would be interesting to evaluate the effect of these details, but
 our results so far indicate that they may not have much impact for
 real workloads.
 
-Another approach for utilization improvment that was perviously introduced 
-is altering resources requirments of job submission. 
-Yom-Tov And Aridor suggested reduction of memory requirments \cite{yomtov2008}. 
-This approach is orthgnal to ours, and can be combined in the same system altoghther.
+Another approach for utilization improvement that was previously introduced 
+is altering resources requirements of job submission. 
+Yom-Tov And Aridor suggested reduction of memory requirements \cite{yomtov2008}. 
+This approach is orthogonal to ours, and can be combined in the same system altogether.
 Tang et al.\ adjusted job's runtime estimates \cite{Tang2010}. 
 This approach is not relevant to \nb\ . 
 \nb\ scheduler uses transient reservations, hence there is no promise about the actual dispatch 
