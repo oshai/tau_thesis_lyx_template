@@ -393,6 +393,7 @@
 %
 \def\Title#1{\gdef\@Title{#1}}
 \def\Author#1{\gdef\@Author{#1}}
+\def\Supervisor#1{\gdef\@Supervisor{#1}}
 \def\Year#1{\gdef\@Year{#1}}  \Year{\year}
 \def\Degree#1{\gdef\@Degree{#1}} \Degree{Doctor of Philosophy}
 
@@ -410,6 +411,7 @@
   \Signatures{3} % number of signature lines
  
 \def\textofby#1{\gdef\@textofby{#1}}  \textofby{by}
+\def\textofsupervision#1{\gdef\@textofsupervision{#1}}  \textofsupervision{This work was carried out under the supervision of}
 \def\textofApproved#1{\gdef\@textofApproved{#1}}  \textofApproved{Approved by}
 \def\textofChair#1{\gdef\@textofChair{#1}}  
        \textofChair{(Chairperson of Supervisory Committee)}
@@ -450,6 +452,8 @@
       \@textofby
       \par%\vskip0pt plus2fill\relax
       \@Author                      %% Author
+      \par\vskip0pt plus1fill\relax
+	  \@Supervisor                      %% Supervisor
       \par\vskip0pt plus1fill\relax
       %% \rule{37.5mm}{0.5pt}
     \end{center}
